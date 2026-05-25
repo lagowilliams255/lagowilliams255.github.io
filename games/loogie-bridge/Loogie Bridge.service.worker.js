@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1779744854|217463746';
+const CACHE_VERSION = '1779747984|26748990';
 /** @type {string} */
 const CACHE_PREFIX = 'Loogie Bridge-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;

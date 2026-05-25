@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1779745189|27860641';
+const CACHE_VERSION = '1779747942|2780859572';
 /** @type {string} */
 const CACHE_PREFIX = 'Loogie Jump-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
