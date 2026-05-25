@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loogie Games</title>
+    <meta
+      name="description"
+      content="Play Loogie Jump and Loogie Bridge online."
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="Loogie Games home">
+        <span class="brand-mark">LG</span>
+        <span>
+          <span class="brand-title">Loogie Games</span>
+          <span class="brand-subtitle">Web arcade</span>
+        </span>
+      </a>
+
+      <nav class="game-tabs" aria-label="Games">
+        <button class="tab is-active" type="button" data-game-id="jump">
+          Loogie Jump
+        </button>
+        <button class="tab" type="button" data-game-id="bridge">
+          Loogie Bridge
+        </button>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <section class="player-region" aria-label="Selected game">
+        <div class="player-toolbar">
+          <div>
+            <p class="eyebrow">Now playing</p>
+            <h1 id="active-title">Loogie Jump</h1>
+          </div>
+          <a
+            class="open-link"
+            id="open-game"
+            href="../Loogie%20Jump/Loogie%20Jump.html"
+            target="_blank"
+            rel="noopener"
+          >
+            Open full tab
+          </a>
+        </div>
+
+        <div class="player-frame">
+          <iframe
+            id="game-frame"
+            title="Loogie Jump"
+            src="../Loogie%20Jump/Loogie%20Jump.html"
+            allow="autoplay; fullscreen; gamepad"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </section>
+
+      <aside class="library" aria-label="Game library">
+        <article class="game-card is-selected" data-game-id="jump">
+          <img
+            src="../Loogie%20Jump/Loogie%20Jump.png"
+            alt="Loogie Jump preview"
+            loading="eager"
+          />
+          <div class="game-card-body">
+            <p class="eyebrow">Arcade</p>
+            <h2>Loogie Jump</h2>
+            <p>Fast vertical platforming built for quick browser sessions.</p>
+            <button class="play-button" type="button" data-game-id="jump">
+              Play
+            </button>
+          </div>
+        </article>
+
+        <article class="game-card" data-game-id="bridge">
+          <img
+            src="../Loogie%20Bridge/Loogie%20Bridge.png"
+            alt="Loogie Bridge preview"
+            loading="lazy"
+          />
+          <div class="game-card-body">
+            <p class="eyebrow">Puzzle</p>
+            <h2>Loogie Bridge</h2>
+            <p>Build a route, cross the gap, and keep the run moving.</p>
+            <button class="play-button" type="button" data-game-id="bridge">
+              Play
+            </button>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <script src="./assets/app.js"></script>
+  </body>
+</html>
