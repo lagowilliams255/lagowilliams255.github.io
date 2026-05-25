@@ -11,7 +11,10 @@ python -m http.server 8080
 
 Open `http://localhost:8080/` or `http://localhost:8080/Site/`.
 
-The game exports live outside this folder:
+The game exports used by the deployed site live inside this folder:
 
-- `Website/Loogie Jump/Loogie Jump.html`
-- `Website/Loogie Bridge/Loogie Bridge.html`
+- `Website/Site/games/loogie-jump/Loogie Jump.html`
+- `Website/Site/games/loogie-bridge/Loogie Bridge.html`
+
+The original Godot exports can still live outside the site folder. Copy new exports
+into the matching `Website/Site/games/...` folder before deploying updates.

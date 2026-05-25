@@ -1,11 +1,11 @@
 const games = {
   jump: {
     title: "Loogie Jump",
-    url: "../Loogie%20Jump/Loogie%20Jump.html",
+    url: "./games/loogie-jump/Loogie%20Jump.html",
   },
   bridge: {
     title: "Loogie Bridge",
-    url: "../Loogie%20Bridge/Loogie%20Bridge.html",
+    url: "./games/loogie-bridge/Loogie%20Bridge.html",
   },
 };
 
