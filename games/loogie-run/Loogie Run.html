@@ -1,330 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1"
-    />
-    <title>Loogie Run</title>
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>Loogie Run</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
 
-      html,
-      body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #050605;
-        color: #f3f6ef;
-        font-family:
-          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
-        touch-action: none;
-      }
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
 
-      body {
-        display: grid;
-        place-items: center;
-      }
+#canvas {
+	display: block;
+}
 
-      canvas {
-        display: block;
-        width: min(100vw, 56.25vh);
-        height: min(177.78vw, 100vh);
-        max-width: 100vw;
-        max-height: 100vh;
-        background: #5b9ec0;
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="game" width="360" height="640" aria-label="Loogie Run"></canvas>
+#canvas:focus {
+	outline: none;
+}
 
-    <script>
-      const canvas = document.querySelector("#game");
-      const ctx = canvas.getContext("2d");
-      const width = canvas.width;
-      const height = canvas.height;
-      const groundY = 510;
-      const player = {
-        x: 82,
-        y: groundY,
-        w: 28,
-        h: 44,
-        vy: 0,
-        hold: 0,
-        holding: false,
-      };
-      const state = {
-        screen: "menu",
-        score: 0,
-        best: Number(localStorage.getItem("loogie-run-best") || 0),
-        distance: 0,
-        speed: 235,
-        nextSpawn: width + 190,
-        frameTime: 0,
-        marks: Array.from({ length: 8 }, (_, index) => index * 48),
-        obstacles: [],
-      };
-      const walkImage = new Image();
-      const jumpImage = new Image();
-      walkImage.src = "./loogie_walk_spritesheet.png";
-      jumpImage.src = "./loogie_jump_spritesheet.png";
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
 
-      function resetGame() {
-        state.screen = "playing";
-        state.score = 0;
-        state.distance = 0;
-        state.speed = 235;
-        state.nextSpawn = width + 190;
-        state.obstacles = [];
-        state.marks = Array.from({ length: 8 }, (_, index) => index * 48);
-        player.y = groundY;
-        player.vy = 0;
-        player.hold = 0;
-        player.holding = false;
-      }
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
 
-      function endGame() {
-        state.screen = "over";
-        player.holding = false;
-        state.best = Math.max(state.best, state.score);
-        localStorage.setItem("loogie-run-best", String(state.best));
-      }
+#status {
+	background-color: #242424;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
 
-      function press() {
-        if (state.screen !== "playing") {
-          resetGame();
-          return;
-        }
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
 
-        player.holding = true;
-        if (player.y >= groundY - 0.5) {
-          player.vy = -650;
-          player.hold = 0;
-        }
-      }
+#status-splash.show-image--false {
+	display: none;
+}
 
-      function release() {
-        player.holding = false;
-        if (player.vy < 0 && player.hold < 0.2) {
-          player.vy *= 0.46;
-        }
-      }
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
 
-      function spawnObstacle() {
-        const airborne = Math.random() < 0.34;
-        if (airborne) {
-          const h = rand(34, 48);
-          state.obstacles.push({
-            x: state.nextSpawn,
-            y: groundY - rand(118, 164) - h,
-            w: rand(44, 68),
-            h,
-            color: "#eb4538",
-          });
-          return;
-        }
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
 
-        const h = rand(48, 80);
-        state.obstacles.push({
-          x: state.nextSpawn,
-          y: groundY - h,
-          w: rand(26, 44),
-          h,
-          color: "#1c2117",
-        });
-      }
+#status-progress, #status-notice {
+	display: none;
+}
 
-      function update(delta) {
-        if (state.screen !== "playing") {
-          return;
-        }
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
 
-        state.speed = Math.min(520, state.speed + 7.2 * delta);
-        state.distance += state.speed * delta;
-        state.score = Math.floor(state.distance / 16);
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="Loogie Run.icon.png" />
+<link rel="apple-touch-icon" href="Loogie Run.apple-touch-icon.png"/>
+<link rel="manifest" href="Loogie Run.manifest.json">
 
-        const gravity =
-          player.holding && player.vy < 0 && player.hold < 0.2 ? 966 : 2100;
-        if (player.holding && player.vy < 0) {
-          player.hold += delta;
-        }
-        player.vy += gravity * delta;
-        player.y += player.vy * delta;
-        if (player.y >= groundY) {
-          player.y = groundY;
-          player.vy = 0;
-          player.hold = 0.2;
-        }
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
 
-        for (const obstacle of state.obstacles) {
-          obstacle.x -= state.speed * delta;
-        }
-        state.obstacles = state.obstacles.filter((obstacle) => obstacle.x > -90);
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
 
-        while (state.nextSpawn <= width + 70) {
-          spawnObstacle();
-          state.nextSpawn += rand(210, 405) + state.speed * 0.18;
-        }
-        state.nextSpawn -= state.speed * delta;
+		<div id="status">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="Loogie Run.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
 
-        state.marks = state.marks.map((mark) => {
-          let next = mark - state.speed * delta;
-          if (next <= -48) {
-            next += width + 96;
-          }
-          return next;
-        });
+		<script src="Loogie Run.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"Loogie Run","experimentalVK":false,"fileSizes":{"Loogie Run.pck":6039120,"Loogie Run.wasm":35754592},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"Loogie Run.service.worker.js"};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
 
-        const body = {
-          x: player.x - 10,
-          y: player.y - 42,
-          w: 23,
-          h: 40,
-        };
-        if (state.obstacles.some((obstacle) => overlaps(body, obstacle))) {
-          endGame();
-        }
-      }
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
 
-      function draw() {
-        drawWorld();
-        drawObstacles();
-        drawPlayer();
-        drawHud();
-        if (state.screen === "menu") {
-          drawPanel("Loogie Run", `Best ${state.best}`, "Play");
-        } else if (state.screen === "over") {
-          drawPanel("Game Over", `Score ${state.score}   Best ${state.best}`, "Retry");
-        }
-      }
+	let initializing = true;
+	let statusMode = '';
 
-      function drawWorld() {
-        ctx.fillStyle = "#5b9ec0";
-        ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = "#78be54";
-        ctx.fillRect(0, 340, width, height - 340);
-        ctx.fillStyle = "#b6ec4a";
-        ctx.fillRect(0, groundY - 10, width, 10);
-        ctx.fillStyle = "#1e2319";
-        ctx.fillRect(0, groundY, width, 54);
-        ctx.fillStyle = "#d9ff71";
-        for (const mark of state.marks) {
-          ctx.fillRect(mark, groundY + 22, 24, 6);
-        }
-      }
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
 
-      function drawObstacles() {
-        for (const obstacle of state.obstacles) {
-          ctx.fillStyle = obstacle.color;
-          roundedRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h, 6);
-        }
-      }
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
 
-      function drawPlayer() {
-        const grounded = player.y >= groundY - 0.5;
-        if (grounded && walkImage.complete && walkImage.width) {
-          const frame = 1 + (Math.floor(state.frameTime * 13) % 4);
-          drawSprite(walkImage, 5, frame, player.x - 29, player.y - 78, 72, 72);
-          return;
-        }
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
 
-        if (jumpImage.complete && jumpImage.width) {
-          const frame = player.vy < -210 ? 3 : player.vy < 130 ? 4 : 5;
-          drawSprite(jumpImage, 12, frame, player.x - 29, player.y - 78, 72, 72);
-        }
-      }
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
 
-      function drawHud() {
-        ctx.fillStyle = "#f3f6ef";
-        ctx.textAlign = "center";
-        ctx.font = "800 34px system-ui, sans-serif";
-        ctx.fillText(String(state.score), width / 2, 55);
-        ctx.textAlign = "right";
-        ctx.font = "800 16px system-ui, sans-serif";
-        ctx.fillText(String(Math.round(state.speed)), width - 20, 46);
-        if (state.screen === "playing" && state.score < 8) {
-          ctx.textAlign = "center";
-          ctx.font = "700 18px system-ui, sans-serif";
-          ctx.fillText("Tap to jump. Hold for height.", width / 2, height - 82);
-        }
-      }
-
-      function drawPanel(title, line, button) {
-        ctx.fillStyle = "rgba(5, 6, 5, 0.58)";
-        ctx.fillRect(0, 0, width, height);
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#f3f6ef";
-        ctx.font = "900 52px system-ui, sans-serif";
-        ctx.fillText(title, width / 2, 270);
-        ctx.font = "800 22px system-ui, sans-serif";
-        ctx.fillText(line, width / 2, 318);
-        ctx.fillStyle = "#b6ec4a";
-        roundedRect(70, 350, 220, 56, 8);
-        ctx.fillStyle = "#17200f";
-        ctx.font = "900 24px system-ui, sans-serif";
-        ctx.fillText(button, width / 2, 386);
-      }
-
-      function drawSprite(image, frames, frame, x, y, w, h) {
-        const frameWidth = image.width / frames;
-        ctx.drawImage(image, frameWidth * frame, 0, frameWidth, image.height, x, y, w, h);
-      }
-
-      function roundedRect(x, y, w, h, radius) {
-        ctx.beginPath();
-        ctx.roundRect(x, y, w, h, radius);
-        ctx.fill();
-      }
-
-      function overlaps(a, b) {
-        return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-      }
-
-      function rand(min, max) {
-        return min + Math.random() * (max - min);
-      }
-
-      let lastTime = performance.now();
-      function tick(time) {
-        const delta = Math.min(0.033, (time - lastTime) / 1000);
-        lastTime = time;
-        state.frameTime += delta;
-        update(delta);
-        draw();
-        requestAnimationFrame(tick);
-      }
-
-      addEventListener("pointerdown", (event) => {
-        event.preventDefault();
-        press();
-      });
-      addEventListener("pointerup", (event) => {
-        event.preventDefault();
-        release();
-      });
-      addEventListener("pointercancel", release);
-      addEventListener("keydown", (event) => {
-        if (event.code === "Space" || event.code === "ArrowUp") {
-          event.preventDefault();
-          if (!event.repeat) {
-            press();
-          }
-        }
-      });
-      addEventListener("keyup", (event) => {
-        if (event.code === "Space" || event.code === "ArrowUp") {
-          event.preventDefault();
-          release();
-        }
-      });
-
-      requestAnimationFrame(tick);
-    </script>
-  </body>
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
 </html>
+
