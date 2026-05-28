@@ -7,6 +7,10 @@ const games = {
     title: "Loogie Bridge",
     url: "./games/loogie-bridge/Loogie%20Bridge.html",
   },
+  run: {
+    title: "Loogie Run",
+    url: "./games/loogie-run/Loogie%20Run.html",
+  },
 };
 
 const frame = document.querySelector("#game-frame");
